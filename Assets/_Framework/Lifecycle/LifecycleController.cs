@@ -38,7 +38,7 @@ namespace GameVault.FrameWork
                 case GameState.none:
                     return to == GameState.Boot;
                 case GameState.Boot:
-                    return to == GameState.Loading;
+                    return to == GameState.Loading || to == GameState.MainMenu;
                 case GameState.Loading:
                     return to == GameState.MainMenu || to == GameState.GamePlay;
                 case GameState.MainMenu:

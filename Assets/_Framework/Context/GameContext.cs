@@ -1,5 +1,7 @@
 using System;
 using GameVault.FrameWork.Lifecyle;
+using GameVault.FrameWork.SceneManagement;
+using GameVault.FrameWork.System;
 
 namespace GameVault.FrameWork
 {
@@ -7,12 +9,13 @@ namespace GameVault.FrameWork
     {
         private static GameContext _instance;
         private LifecycleController _lifecycle;
-
+        private SystemRegistry _system;
 
         public static GameContext Instance => _instance;
 
         public static bool IsCreated => _instance != null;
         public LifecycleController Lifecycle => _lifecycle;
+        public SystemRegistry System => _system;
 
         /// <summary>
         /// All Initilize should explitly happens here
@@ -24,13 +27,15 @@ namespace GameVault.FrameWork
         }
 
 
-        public static void Create()
+        public static void Create(Action<GameState,GameState> listener)
         {
            if(_instance != null)
             {
                 throw new InvalidOperationException("GameContext Has Already Been Created");
             }
            _instance = new GameContext();
+           _instance._lifecycle = new LifecycleController();
+           _instance.Lifecycle.OnStateChanged += listener;
            _instance.Initilize();
 
         }
@@ -52,9 +57,13 @@ namespace GameVault.FrameWork
             // - Create system registry
             // - Initialize core services
 
-            _lifecycle = new LifecycleController();
-            _lifecycle.Initilize();
+            _system = new SystemRegistry();
+            _system.Register(new DebugLifecycleSystem());
+            _system.Register(new SceneSystem());
 
+            _system.InitializeAll();
+            _lifecycle.Initilize();
+          
 
         }
 
@@ -65,6 +74,8 @@ namespace GameVault.FrameWork
             // - Shutdown systems
             // - Dispose services
 
+            _system.DisposeAll();
+            _system = null;
             _lifecycle = null;
         }
     }

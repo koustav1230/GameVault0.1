@@ -13,17 +13,27 @@ namespace GameVault.FrameWork.Bootstrap
         {
 
             DontDestroyOnLoad(gameObject);
-            GameContext.Create();
-
-            GameContext.Instance.Lifecycle.OnStateChanged += Test;
-
+            GameContext.Create(Test);
 
         }
 
-  
+
+        private void Update()
+        {
+            if(Input.GetKeyDown(KeyCode.M))
+            {
+                GameContext.Instance.Lifecycle.ChangeState(GameState.MainMenu);
+            }
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                GameContext.Instance.Lifecycle.ChangeState(GameState.GamePlay);
+            }
+
+        }
+
         void Test(GameState c , GameState x)
         {
-            UnityEngine.Debug.Log($"{c} -> {x}");
+            //UnityEngine.Debug.Log($"{c} -> {x}");
         }
         private void OnDestroy()
         {
