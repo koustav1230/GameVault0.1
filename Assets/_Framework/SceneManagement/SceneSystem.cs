@@ -1,41 +1,85 @@
 using GameVault.FrameWork.Lifecyle;
 using GameVault.FrameWork.System;
+using System.Collections;
 using System.Diagnostics;
+using UnityEditor;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace GameVault.FrameWork.SceneManagement
 {
-    public sealed class SceneSystem : SystemBase
+    public sealed class SceneSystem : SystemBase, ILoadingProgressProvider
     {
         private SceneConfig _config;
+        private Coroutine _loadingRouting;
+        private ISceneLoadListener _loadListener;
+
+
+        private float _progress;
+        private bool _isLoading;
+
+        public float Progress => _progress;
+        public bool IsLoading => _isLoading;
+
         public override void Initialize()
         {
           _config = new SceneConfig();
-           context.Lifecycle.OnStateChanged += OnSceneChange;
         }
 
-        public override void Dispose()
+        public void RegisterLoadListener(ISceneLoadListener listener)
         {
-            context.Lifecycle.OnStateChanged -= OnSceneChange;
+            _loadListener = listener;
         }
 
-        private void OnSceneChange(GameState from,GameState to)
+
+        public void Load(SceneID sceneID)
         {
-            if(!_config.TryGetScene(to, out var sceneID))
-            {
+            if (_isLoading)
                 return;
-            }
+
+            _loadingRouting = context.SystemRunner.Run(LoadRoutine(sceneID));
+        }
+
+
+        private IEnumerator LoadRoutine(SceneID targetScene)
+        {
+            _isLoading = true;
+            _progress = 0f;
+
+            //phase 1 - Load Loading scene
+
+            yield return LoadUnityScene(SceneID.Loading);
+
+            //Phase 2 - Load target scene
+
+            yield return LoadUnityScene(targetScene);
+
+            _isLoading = false;
+            _loadListener?.OnSceneLoadCompleted();
+        }
+
+        private IEnumerator LoadUnityScene(SceneID sceneID)
+        {
 
             var sceneName = _config.GetSceneName(sceneID);
+            //UnityEngine.Debug.Log($"[SceneSystem] Loading Scene : {sceneName}");
 
-            if(SceneManager.GetActiveScene().name.Equals(sceneName))
+            var op = SceneManager.LoadSceneAsync(sceneName);
+            op.allowSceneActivation = false;
+
+            while (op.progress < 0.9f)
             {
-                return;
+                _progress = op.progress / 0.9f; // normalized 0 - 1
+                yield return null;
             }
 
-            UnityEngine.Debug.Log($"[SceneSystem] Loading Scene : {sceneName}");
-            SceneManager.LoadScene(sceneName);
+
+            _progress = 1f;
+            op.allowSceneActivation = true;
+            yield return null;
 
         }
+
+
     }
 }

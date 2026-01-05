@@ -1,4 +1,6 @@
 
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace GameVault.FrameWork.System
@@ -9,7 +11,10 @@ namespace GameVault.FrameWork.System
     /// </summary>
     public sealed class SystemRunner : MonoBehaviour
     {
-
+        private void Awake()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
         public void Update()
         {
             if(!GameContext.IsCreated)
@@ -17,6 +22,11 @@ namespace GameVault.FrameWork.System
                 return;
             }
             GameContext.Instance.System.TickAll(Time.deltaTime);
+        }
+
+        public Coroutine Run(IEnumerator routine)
+        {
+            return StartCoroutine(routine);
         }
     }
 }

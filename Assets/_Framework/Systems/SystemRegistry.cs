@@ -48,7 +48,37 @@ namespace GameVault.FrameWork.System
             }
             foreach (ISystem system in _systems)
             {
+                if(system is IStateScopedSystem scoped && !scoped.IsActive)
+                {
+                    continue;
+                }
+
                 system.Tick(deltaTime);
+            }
+        }
+
+
+        public T Get<T>() where T :class ,ISystem
+        {
+            foreach(var system in _systems)
+            {
+                if(system is T typed)
+                {
+                    return typed;
+                }
+            }
+            return null;
+        }
+
+
+        public IEnumerable<T> GetAll<T>() where T : class , ISystem
+        {
+            foreach(var system in _systems)
+            {
+                if(system is T typed)
+                {
+                    yield return typed;
+                }
             }
         }
 

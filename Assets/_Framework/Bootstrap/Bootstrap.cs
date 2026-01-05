@@ -1,45 +1,42 @@
 
-using UnityEngine;
-using GameVault.FrameWork;
-using System.Diagnostics;
+using GameVault.FrameWork.Core.GameFlow;
 using GameVault.FrameWork.Lifecyle;
+using GameVault.FrameWork.System;
+using UnityEngine;
 
 namespace GameVault.FrameWork.Bootstrap
 {
     public sealed class Bootstrap : MonoBehaviour
     {
-
+        [SerializeField] private SystemRunner systemRunner;
         private void Awake()
         {
-
             DontDestroyOnLoad(gameObject);
-            GameContext.Create(Test);
+            DontDestroyOnLoad(systemRunner.gameObject);
+
+            if (!GameContext.IsCreated)
+            {
+                GameContext.Create(systemRunner, OnStateChanged);
+                GameContext.Instance.System.Get<GameFlowSystem>().RequestMainMenu();
+            
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
 
         }
 
 
         private void Update()
         {
-            if(Input.GetKeyDown(KeyCode.M))
-            {
-                GameContext.Instance.Lifecycle.ChangeState(GameState.MainMenu);
-            }
-            if (Input.GetKeyDown(KeyCode.G))
-            {
-                GameContext.Instance.Lifecycle.ChangeState(GameState.GamePlay);
-            }
-
         }
 
-        void Test(GameState c , GameState x)
+        void OnStateChanged(GameState c , GameState x)
         {
             //UnityEngine.Debug.Log($"{c} -> {x}");
         }
-        private void OnDestroy()
-        {
-            GameContext.Instance.Lifecycle.OnStateChanged -= Test;
-            GameContext.Destroy();
-        }
+  
     }
 
 }

@@ -33,12 +33,16 @@ namespace GameVault.FrameWork
 
         private bool IsTrasitionValid(GameState from,GameState to)
         {
+            if(to == GameState.Loading)
+            {
+                return from != GameState.ShutDown;
+            }
             switch(from)
             {
                 case GameState.none:
                     return to == GameState.Boot;
                 case GameState.Boot:
-                    return to == GameState.Loading || to == GameState.MainMenu;
+                    return to == GameState.Loading;
                 case GameState.Loading:
                     return to == GameState.MainMenu || to == GameState.GamePlay;
                 case GameState.MainMenu:

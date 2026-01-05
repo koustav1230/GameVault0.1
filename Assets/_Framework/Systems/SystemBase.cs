@@ -8,6 +8,7 @@ namespace GameVault.FrameWork.System
     public abstract class SystemBase : ISystem
     {
         protected GameContext context => GameContext.Instance;
+
         public virtual void Dispose(){}
 
         public virtual void Initialize(){}

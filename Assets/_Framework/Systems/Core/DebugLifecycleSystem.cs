@@ -22,7 +22,7 @@ namespace GameVault.FrameWork.System
             if (_timer >= 1f )
             {
                 _timer = 0f;
-                Debug.Log("DebugLifecycle Ticked....");
+                //Debug.Log("DebugLifecycle Ticked....");
 
             }
         }
