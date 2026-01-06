@@ -5,7 +5,7 @@ using GameVault.FrameWork.Presentation.Loading;
 using GameVault.FrameWork.SceneManagement;
 using GameVault.FrameWork.System;
 using GameVault.FrameWork.System.Input;
-
+using GameVault.FrameWork.System.Loading;
 namespace GameVault.FrameWork
 {
     public sealed class GameContext
@@ -77,6 +77,7 @@ namespace GameVault.FrameWork
             _system.Register(new GameFlowSystem());
             _system.Register(new StateScopeSystem()); 
             _system.Register(new SceneSystem());
+            _system.Register(new LoadingOrchestratorSystem());
             _system.Register(new UILoadingSystem());
             _system.Register(new MainMenuInputSystem());
             _system.Register(new GameplayInputSystem());

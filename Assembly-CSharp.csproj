@@ -75,6 +75,7 @@
     <Compile Include="Assets\_Framework\Systems\Input\DebugInputSystem.cs" />
     <Compile Include="Assets\_Framework\SceneManagement\SceneSystem.cs" />
     <Compile Include="Assets\_Framework\Systems\Input\GameplayInputSystem.cs" />
+    <Compile Include="Assets\_Framework\Systems\Core\Loading\LoadingOrchestratorSystem.cs" />
     <Compile Include="Assets\_Framework\SceneManagement\ISceneLoadListener.cs" />
     <Compile Include="Assets\_Framework\Lifecycle\GameState.cs" />
     <Compile Include="Assets\_Framework\Systems\UI\MainMenuUISystem.cs" />
@@ -82,11 +83,15 @@
     <Compile Include="Assets\_Framework\Systems\ISystem.cs" />
     <Compile Include="Assets\_Framework\Systems\UI\GameplayUISystem.cs" />
     <Compile Include="Assets\_Framework\Context\GameContext.cs" />
+    <Compile Include="Assets\_Framework\Systems\Core\Loading\LoadingPhaseType.cs" />
     <Compile Include="Assets\_Framework\Systems\SystemRegistry.cs" />
+    <Compile Include="Assets\_Framework\Systems\Core\Loading\ILoadingPhase.cs" />
     <Compile Include="Assets\_Framework\Lifecycle\LifecycleController.cs" />
+    <Compile Include="Assets\_Framework\Systems\Core\Loading\LoadingPipeline.cs" />
     <Compile Include="Assets\_Framework\Systems\Core\StateScopeSystem.cs" />
     <Compile Include="Assets\_Framework\SceneManagement\SceneConfig.cs" />
     <Compile Include="Assets\_Framework\Systems\SystemBase.cs" />
+    <Compile Include="Assets\_Framework\Systems\Core\Loading\SceneLoadingPhase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
