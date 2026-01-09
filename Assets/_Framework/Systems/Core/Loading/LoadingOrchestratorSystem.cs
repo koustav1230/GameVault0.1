@@ -1,52 +1,78 @@
+using GameVault.FrameWork.Core.GameFlow;
+using GameVault.FrameWork.Lifecyle;
+using GameVault.FrameWork.System.Loading.Phases;
 using GameVault.FrameWork.SceneManagement;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace GameVault.FrameWork.System.Loading
 {
-    public sealed class LoadingOrchestratorSystem : SystemBase, ILoadingProgressProvider
+    public sealed class LoadingOrchestratorSystem : SystemBase
     {
         private LoadingPipeline _pipeline;
-        private float _progress;
-        private bool _isloading;
+        private GameState _targetState;
 
-        public float Progress => _progress;
 
-        public bool IsLoading => _isloading;
-
+        public float Progress => _pipeline?.Progress ?? 0f;
         public override void Initialize()
         {
             Debug.Log("[LoadingOrchestratorSystem] Initialized");
         }
 
-        public void StartLoading(SceneID targetScene)
+
+        public override void Tick(float deltaTime)
         {
-            if(_isloading)
+            if(_pipeline == null)
             {
                 return;
             }
 
-            _pipeline = new LoadingPipeline();
-
-            _pipeline.AddPhase(new SceneLoadingPhase(context.System.Get<SceneSystem>(),targetScene));
-            _isloading = true;
-            //context.SystemRunner.Run(RunPipeline());
+            _pipeline.Tick(deltaTime);
+            if(_pipeline.State == Pipeline.LoadingPipelineState.AwaitingCompletion)
+            {
+                OnPipelineCompleted();
+            }
         }
 
-        //private IEnumerator RunPipeline()
-        //{
-        //    var runner = _pipeline.Run();
+        /// <summary>
+        /// public api (called by Gameflow)
+        /// </summary>
+        /// <param name="targetState"></param>
+        public void BeginLoading(GameState targetState)
+        {
+            _targetState = targetState;
+            BuildPipeline(targetState);
+            _pipeline.Start();
+        }
 
-        //    while(runner.MoveNext())
-        //    {
-        //        _progress = _pipeline.TotalProgress;
-        //        yield return null;
+        /// <summary>
+        /// pipeline setup
+        /// </summary>
+        /// <param name="targetState"></param>
+        private void BuildPipeline(GameState targetState)
+        {
 
-        //    }
-        //    _progress = 0f;
-        //    _isloading = false;
-        //}
+            _pipeline = new LoadingPipeline();
+
+            var sceneSystem = context.System.Get<SceneSystem>();
+            SceneID targetScene = targetState == GameState.MainMenu ? SceneID.MainMenu : SceneID.GamePlay;
+
+            _pipeline.AddPhase(new MinimumTimePhase(1.5f));
+            _pipeline.AddPhase(new SceneLoadingPhase(sceneSystem, targetScene));
+
+            Debug.Log($"[LoadingOrchestratorSystem] pipeline built for {targetState}");
+        }
+
+        private void OnPipelineCompleted()
+        {
+            Debug.Log("[LoadingOrchestratorSystem] Pipeline completed");
+
+            _pipeline.Complete();
+            _pipeline = null;
+
+            context.System.Get<GameFlowSystem>().OnLoadingCompleted(_targetState);
+
+        }
+
 
     }
 }

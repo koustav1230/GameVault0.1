@@ -2,6 +2,7 @@ using GameVault.FrameWork.Core.GameFlow;
 using GameVault.FrameWork.Lifecyle;
 using GameVault.FrameWork.SceneManagement;
 using GameVault.FrameWork.System;
+using GameVault.FrameWork.System.Loading;
 using UnityEngine;
 
 namespace GameVault.FrameWork.Presentation.Loading
@@ -9,15 +10,16 @@ namespace GameVault.FrameWork.Presentation.Loading
     public sealed class UILoadingSystem : SystemBase ,IStateScopedUISystem
     {
 
-        public GameState State => GameState.Loading;
-
+        private LoadingOrchestratorSystem _orchestrator;
         private ILoadingProgressProvider _progressProvider;
         private bool _visible;
 
+        public GameState State => GameState.Loading;
 
         public override void Initialize()
         {
             _progressProvider = context.System.Get<SceneSystem>();
+            _orchestrator = context.System.Get<LoadingOrchestratorSystem>();
             _visible = false;
 
             Debug.Log("[UILoading] Initialized");
@@ -28,12 +30,12 @@ namespace GameVault.FrameWork.Presentation.Loading
 
         public override void Tick(float deltaTime)
         {
-            if (!_visible || !_progressProvider.IsLoading)
+            if (!_visible)
             {
                 return;
             }
 
-            UpdateProgress(_progressProvider.Progress);
+            UpdateProgress(_orchestrator.Progress);
         }
 
 

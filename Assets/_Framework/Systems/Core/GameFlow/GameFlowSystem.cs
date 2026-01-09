@@ -2,21 +2,21 @@
 using GameVault.FrameWork.Lifecyle;
 using GameVault.FrameWork.SceneManagement;
 using GameVault.FrameWork.System;
+using GameVault.FrameWork.System.Loading;
 
 
 namespace GameVault.FrameWork.Core.GameFlow
 {
-    public class GameFlowSystem : SystemBase, ISceneLoadListener
+    public class GameFlowSystem : SystemBase
     {
-        private SceneSystem _sceneSystem;
-        private GameState _targetState;
+
+        private GameState _pendingTarget;
         private bool _isLoading;
 
      
         public override void Initialize()
         {
-            _sceneSystem = context.System.Get<SceneSystem>();
-            _sceneSystem.RegisterLoadListener(this);
+         
         }
 
         public void RequestMainMenu()=>
@@ -42,22 +42,20 @@ namespace GameVault.FrameWork.Core.GameFlow
             }
 
             _isLoading = true;
-            _targetState = target;
+            _pendingTarget = target;
 
             context.Lifecycle.ChangeState(GameState.Loading);
 
-            _sceneSystem.Load(target == GameState.MainMenu ? SceneID.MainMenu : SceneID.GamePlay);
+            context.System.Get<LoadingOrchestratorSystem>().BeginLoading(target);
 
          
         }
 
-        public void OnSceneLoadCompleted()
+        public void OnLoadingCompleted(GameState targetState)
         {
-            if (!_isLoading)
-                return;
-
+         
             _isLoading = false;
-            context.Lifecycle.ChangeState(_targetState);
+            context.Lifecycle.ChangeState(targetState);
         }
     }
 
