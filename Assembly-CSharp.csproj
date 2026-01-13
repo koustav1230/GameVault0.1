@@ -86,10 +86,12 @@
     <Compile Include="Assets\_Framework\Systems\UI\GameplayUISystem.cs" />
     <Compile Include="Assets\_Framework\Context\GameContext.cs" />
     <Compile Include="Assets\_Framework\Systems\Core\Loading\LoadingPhaseType.cs" />
+    <Compile Include="Assets\_Framework\Systems\UI\Loading\LoadingProgressSmoother.cs" />
     <Compile Include="Assets\_Framework\Systems\Core\Loading\Phases\MinimumTimePhase.cs" />
     <Compile Include="Assets\_Framework\Systems\SystemRegistry.cs" />
     <Compile Include="Assets\_Framework\Systems\Core\Loading\ILoadingPhase.cs" />
     <Compile Include="Assets\_Framework\Lifecycle\LifecycleController.cs" />
+    <Compile Include="Assets\_Framework\Systems\Core\Loading\Phases\WarmupCachePhase.cs" />
     <Compile Include="Assets\_Framework\Systems\Core\StateScopeSystem.cs" />
     <Compile Include="Assets\_Framework\Systems\Core\Loading\Phases\SceneLoadingPhase.cs" />
     <Compile Include="Assets\_Framework\SceneManagement\SceneConfig.cs" />

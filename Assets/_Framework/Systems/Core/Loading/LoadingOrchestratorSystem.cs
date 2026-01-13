@@ -56,8 +56,12 @@ namespace GameVault.FrameWork.System.Loading
             var sceneSystem = context.System.Get<SceneSystem>();
             SceneID targetScene = targetState == GameState.MainMenu ? SceneID.MainMenu : SceneID.GamePlay;
 
-            _pipeline.AddPhase(new MinimumTimePhase(1.5f));
+            //blocking Phase
             _pipeline.AddPhase(new SceneLoadingPhase(sceneSystem, targetScene));
+            _pipeline.AddPhase(new MinimumTimePhase(1.5f));
+
+            //Non-Blocking Phase
+            _pipeline.AddPhase(new WarmupCachePhase());
 
             Debug.Log($"[LoadingOrchestratorSystem] pipeline built for {targetState}");
         }

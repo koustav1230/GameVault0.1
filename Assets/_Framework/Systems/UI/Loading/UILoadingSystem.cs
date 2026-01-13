@@ -14,12 +14,14 @@ namespace GameVault.FrameWork.Presentation.Loading
         private ILoadingProgressProvider _progressProvider;
         private bool _visible;
 
+        private LoadingProgressSmoother _smoother;
         public GameState State => GameState.Loading;
 
         public override void Initialize()
         {
             _progressProvider = context.System.Get<SceneSystem>();
             _orchestrator = context.System.Get<LoadingOrchestratorSystem>();
+            _smoother = new LoadingProgressSmoother();
             _visible = false;
 
             Debug.Log("[UILoading] Initialized");
@@ -35,7 +37,10 @@ namespace GameVault.FrameWork.Presentation.Loading
                 return;
             }
 
-            UpdateProgress(_orchestrator.Progress);
+            float rawProgress = _orchestrator.Progress;
+            float smoothed = _smoother.Tick(rawProgress, deltaTime);
+
+            UpdateProgress(smoothed);
         }
 
 
@@ -46,6 +51,7 @@ namespace GameVault.FrameWork.Presentation.Loading
                 return;
             }
             _visible = true;
+            _smoother.Reset();
 
             Debug.Log("[UILoading] Show");
             UpdateProgress(0f);
@@ -56,8 +62,11 @@ namespace GameVault.FrameWork.Presentation.Loading
         {
             if(!_visible)
             {
-                return ;
-            }  
+                return;
+            } 
+
+            _smoother.MarkCompleted();
+            UpdateProgress(1f);
             _visible = false;
             Debug.Log("[UILoading] Hide");
         }
